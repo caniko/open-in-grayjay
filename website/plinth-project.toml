@@ -1,0 +1,42 @@
+[site]
+title = "open-in-grayjay"
+description = "Open YouTube videos in Grayjay Desktop."
+base_url = "/"
+
+[[nav]]
+label = "Overview"
+href = "#overview"
+[[nav]]
+label = "Source"
+href = "https://github.com/caniko/open-in-grayjay"
+[[footer_links]]
+label = "Source"
+href = "https://github.com/caniko/open-in-grayjay"
+[[pages]]
+slug = "index"
+title = "open-in-grayjay"
+description = "Open YouTube videos in Grayjay Desktop."
+[[pages.sections]]
+type = "hero"
+title = "open-in-grayjay"
+tagline = "Open videos in Grayjay Desktop."
+subtitle = "A tiny browser extension backed by a Rust native host."
+[[pages.sections.ctas]]
+label = "View source"
+href = "https://github.com/caniko/open-in-grayjay"
+primary = true
+[[pages.sections]]
+type = "feature_grid"
+id = "overview"
+[[pages.sections.features]]
+title = "One-click open"
+description = "Send a video from the browser to Grayjay."
+[[pages.sections.features]]
+title = "Rust native host"
+description = "The native host handles validation and communication."
+[[pages.sections.features]]
+title = "Grayjay Sync pairing"
+description = "Pair directly with Grayjay Desktop using Sync."
+[[pages.sections.features]]
+title = "YouTube first"
+description = "Supports YouTube video links and timestamps."

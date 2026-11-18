@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Open in Grayjay",
+  "version": "0.1.0",
+  "browser_specific_settings": {"gecko": {"id": "open-in-grayjay@tartanoglu.com", "strict_min_version": "128.0"}},
+  "permissions": ["nativeMessaging", "contextMenus", "activeTab"],
+  "background": {"scripts": ["background.js"]},
+  "action": {"default_title": "Open in Grayjay", "default_icon": "icon.svg"},
+  "icons": {"48": "icon.svg"}
+}
