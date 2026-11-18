@@ -1,5 +1,11 @@
 # open-in-grayjay
 
+<!-- simit:badges:start -->
+
+[![CI](https://img.shields.io/badge/CI-managed-2088ff)](.github/workflows/ci.yaml)
+
+<!-- simit:badges:end -->
+
 Open YouTube videos in Grayjay Desktop from Firefox or Floorp. A small WebExtension hands the link to a Rust native messaging host, which asks Grayjay to open it over Grayjay's own Sync protocol, the same way Grayjay's phone app sends a video to the desktop.
 
 ## Install

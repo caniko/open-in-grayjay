@@ -2,7 +2,7 @@
   description = "Open YouTube links from Firefox or Floorp in Grayjay Desktop";
 
   inputs = {
-    harbor-rs.url = "git+https://github.com/caniko/harbor-rs.git?ref=feat/browser-extension";
+    harbor-rs.url = "git+https://github.com/caniko/harbor-rs.git?ref=trunk";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
@@ -48,6 +48,8 @@
         cacheRoot = null;
         namespaceScope = "canix-rust";
         namespaceGeneration = 5;
+        # Hosted CI runners have no managed sccache transport.
+        ephemeralFallback = true;
       };
       host = buildCache.withRustCache {
         package = rustPlatform.buildRustPackage {
@@ -84,6 +86,7 @@
         paths = [host native-host addon];
       };
       inherit host native-host addon website;
+      site = website;
     });
 
     devShells = forAllSystems (system: let
