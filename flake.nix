@@ -84,6 +84,7 @@
         paths = [host native-host addon];
       };
       inherit host native-host addon website;
+      site = website;
     });
 
     devShells = forAllSystems (system: let

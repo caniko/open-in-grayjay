@@ -1,0 +1,12 @@
+[ci]
+platform = "github"
+provider = "actions"
+runtime = "nix"
+runner = "ubuntu-24.04"
+publish_crates = false
+all_features = false
+nix_builds = [".#host", ".#native-host", ".#addon", ".#website"]
+
+[ci.pages]
+repo = "caniko/open-in-grayjay"
+canonical_domain = "open-in-grayjay.tartanoglu.com"
