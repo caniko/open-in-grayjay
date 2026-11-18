@@ -16,6 +16,7 @@ The flake builds:
 With Home Manager (use the same browser for both):
 
 ```nix
+home.packages = [open-in-grayjay.packages.${system}.host]; # for `open-in-grayjay pair`
 programs.floorp = {
   nativeMessagingHosts = [open-in-grayjay.packages.${system}.native-host];
   profiles.default.extensions.packages = [open-in-grayjay.packages.${system}.addon];
@@ -28,8 +29,8 @@ The extension is unsigned: release Firefox only installs AMO-signed add-ons; Flo
 
 ## Pair with Grayjay
 
-1. In Grayjay Desktop's Sync settings, turn on **Synchronization Enabled** and **Bind Listener**, and turn off **Relay Pairing** (otherwise Grayjay tries the relay first and gives up before trying this machine).
-2. Run `open-in-grayjay pair`.
+1. In Grayjay Desktop's Sync settings, turn on **Synchronization Enabled** and **Bind Listener**, and turn off **Relay Pairing** (otherwise Grayjay tries the relay first and gives up before trying this machine). Restart Grayjay after saving: it reads these settings when Sync starts.
+2. Run `open-in-grayjay pair` (or `nix run github:caniko/open-in-grayjay#host -- pair`).
 3. Paste the printed `grayjay://sync/…` link into Grayjay's add-device dialog ("Paste device info here").
 
 Pairing runs in this direction because Grayjay pairs reliably when it initiates the connection.
