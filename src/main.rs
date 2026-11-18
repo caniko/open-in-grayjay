@@ -215,6 +215,13 @@ fn initiator(mut s: TcpStream, state: &State, url: &str, position: u64) -> Resul
     authorize(&mut s, &mut t)?;
     let data = serde_json::to_vec(&serde_json::json!({"url":url,"position":position}))?;
     send(&mut s, &mut t, 4, 101, &data)?;
+    // Close our side and drain until Grayjay closes: dropping the socket with
+    // unread input (Grayjay's post-authorization sync data) resets the
+    // connection and can discard the DATA packet before Grayjay reads it.
+    s.shutdown(std::net::Shutdown::Write)?;
+    s.set_read_timeout(Some(Duration::from_secs(2)))?;
+    let mut sink = [0; 4096];
+    while matches!(s.read(&mut sink), Ok(n) if n > 0) {}
     Ok(())
 }
 fn pairing_link(d: &Device) -> Result<String> {
@@ -223,7 +230,7 @@ fn pairing_link(d: &Device) -> Result<String> {
         URL_SAFE_NO_PAD.encode(serde_json::to_vec(d)?)
     ))
 }
-fn pair(addr: &str) -> Result<()> {
+fn pair() -> Result<()> {
     let p = path()?;
     let (private, public) = match fs::read(&p) {
         Ok(b) => {
@@ -236,13 +243,9 @@ fn pair(addr: &str) -> Result<()> {
         Err(e) if e.kind() == io::ErrorKind::NotFound => keypair()?,
         Err(e) => return Err(e.into()),
     };
-    let listener = TcpListener::bind(addr)?;
+    let listener = TcpListener::bind("127.0.0.1:0")?;
     let a = listener.local_addr()?;
-    let ip = if a.ip().is_unspecified() {
-        "127.0.0.1".to_string()
-    } else {
-        a.ip().to_string()
-    };
+    let ip = a.ip().to_string();
     let mut random = [0; 8];
     getrandom::getrandom(&mut random)?;
     let code = URL_SAFE_NO_PAD.encode(random);
@@ -382,8 +385,11 @@ fn open(input: &str, override_addr: Option<&str>) -> Result<()> {
             Command::new(command).stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null()).spawn().map_err(|e| format!("Cannot launch Grayjay: {e}. Enable Synchronization and Bind Listener in Grayjay settings"))?;
             let deadline = Instant::now() + Duration::from_secs(30);
             loop {
-                match connect() { Ok(s)=>break s, Err(_) if Instant::now()<deadline=>thread::sleep(Duration::from_millis(500)), Err(e)=>return Err(format!("Grayjay Sync unavailable: {e}; enable Synchronization and Bind Listener in settings").into()) }
+                match connect() { Ok(_)=>break, Err(_) if Instant::now()<deadline=>thread::sleep(Duration::from_millis(500)), Err(e)=>return Err(format!("Grayjay Sync unavailable: {e}; enable Synchronization and Bind Listener in settings").into()) }
             }
+            // Grayjay's Sync listener starts before its window can receive
+            // OpenUrl, and there is no readiness signal, so don't claim success.
+            return Err("Started Grayjay; open the link again once its window has loaded".into());
         }
     };
     initiator(stream, &state, &url, pos)
@@ -423,14 +429,7 @@ fn native() -> Result<()> {
 fn main() {
     let a: Vec<String> = env::args().collect();
     let r = match a.get(1).map(String::as_str) {
-        Some("pair") => {
-            let addr = if a.get(2).map(String::as_str) == Some("--listen") {
-                a.get(3).map(String::as_str).unwrap_or("")
-            } else {
-                "127.0.0.1:0"
-            };
-            pair(addr)
-        }
+        Some("pair") => pair(),
         Some("open") => {
             if let Some(u) = a.get(2) {
                 open(
