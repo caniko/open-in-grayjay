@@ -48,6 +48,8 @@
         cacheRoot = null;
         namespaceScope = "canix-rust";
         namespaceGeneration = 5;
+        # Hosted CI runners have no managed sccache transport.
+        ephemeralFallback = true;
       };
       host = buildCache.withRustCache {
         package = rustPlatform.buildRustPackage {
