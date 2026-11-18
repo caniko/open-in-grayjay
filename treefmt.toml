@@ -1,0 +1,9 @@
+[formatter.rustfmt]
+command = "rustfmt"
+options = ["--edition", "2024"]
+includes = ["*.rs"]
+excludes = ["target/**"]
+
+[formatter.nix]
+command = "alejandra"
+includes = ["*.nix"]
